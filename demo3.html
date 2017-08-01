@@ -15,18 +15,18 @@
         <br/>
         <br/>
         <div ng-controller="testController">
-            <on-screen-keyboard rows="rows" uppercase-all-words></on-screen-keyboard>
+            <on-screen-keyboard langs="rows" uppercase-all-words></on-screen-keyboard>
         </div>
     </div>
     <script type="text/javascript">
         angular.module('testApp', ['onScreenKeyboard'])
             .controller('testController', function($scope){
-                $scope.rows = [
+                $scope.rows = [[
                     ['q','w','e','r','t','y','u','i','o','p'],
                     ['a','s','d','f','g','h','j','k','l', {type: 'erase', text: '&lArr;'}],
                     [{type: 'shift', upperCase: '&dArr;', lowerCase: '&uArr;'}, 'z','x','c','v','b','n','m',',', '.'],
                     [{type: 'space', colspan: 10, text: ' '}]
-                ];
+                ]];
         });
         setTimeout(function(){
             document.getElementsByTagName('INPUT')[0].focus();

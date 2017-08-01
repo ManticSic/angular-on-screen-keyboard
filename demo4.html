@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" ng-app="testApp">
+<head>
+    <meta charset="UTF-8">
+    <title>angular-on-screen-keyboard Demo 3</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+    <script src="https://code.angularjs.org/1.5.0/angular-sanitize.min.js"></script>
+    <script src="dist/angular-on-screen-keyboard.min.js"></script>
+    <link href="dist/angular-on-screen-keyboard.min.css" rel="stylesheet" />
+</head>
+<body style="margin: 50px;">
+<div>
+    <div>Enter your full name:</div>
+    <input type="text" style="width:800px;"/>
+    <br/>
+    <br/>
+    <div ng-controller="testController">
+        <on-screen-keyboard langs="langs" uppercase-all-words></on-screen-keyboard>
+    </div>
+</div>
+<script type="text/javascript">
+    angular.module('testApp', ['onScreenKeyboard'])
+           .controller('testController', function($scope){
+               $scope.lang1 = [
+                   ['X', 'X', 'X', 'X', {type: 'erase', colspan: 2, text: '&lArr;'}],
+                   [{type: 'margin'},['q', 'Q', '1'], ['w', 'W','2'], ['e', 'E','3'], ['r', 'R', '4'], ['t', 'T', '5']],
+                   [{type: 'caps', colspan: 1, text:'caps'},{type: 'shift', colspan: 1,text:'shift'},{type: 'alt', colspan: 1, text: 'alt'}, {type: 'lang', colspan: 1, text:'lang1'}, {type: 'space', colspan: 2, text: ' '}]
+               ];
+
+               $scope.lang2 = [
+                   ['a', 'b', 'c', 'd', {type: 'erase', colspan: 2, text: '&lArr;'}],
+                   [{type: 'margin'},['q', 'Q', '1'], ['w', 'W','2'], ['e', 'E','3'], ['r', 'R', '4'], ['t', 'T', '5']],
+                   [{type: 'caps', colspan: 1, text:'caps'},{type: 'shift', colspan: 1,text:'shift'},{type: 'alt', colspan: 1, text: 'alt'}, {type: 'lang', colspan: 1, text:'lang2'}, {type: 'space', colspan: 2, text: ' '}]
+               ];
+
+               $scope.lang3 = [
+                   ['a', 'b', 'c', 'd', {type: 'erase', colspan: 2, text: '&lArr;'}],
+                   [{type: 'margin'},['q', 'Q', '1'], ['w', 'W','2'], ['e', 'E','3'], ['r', 'R', '4'], ['t', 'T', '5']],
+                   [{type: 'caps', colspan: 1, text:'caps'},{type: 'shift', colspan: 1,text:'shift'},{type: 'alt', colspan: 1, text: 'alt'}, {type: 'lang', colspan: 1, text:'lang3'}, {type: 'space', colspan: 2, text: ' '}]
+               ];
+
+               $scope.langs = [
+                   $scope.lang1,
+                   $scope.lang2,
+                   $scope.lang3
+               ]
+           });
+    setTimeout(function(){
+        document.getElementsByTagName('INPUT')[0].focus();
+    }, 150);
+</script>
+</body>
+</html>

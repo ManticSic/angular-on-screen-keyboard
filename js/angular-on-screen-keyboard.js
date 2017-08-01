@@ -8,47 +8,72 @@ angular.module('onScreenKeyboard', ['ngSanitize'])
             bindToController: true,
             controllerAs: 'ctrl',
             scope: {
-                rows : '=?',
-                uppercaseAllWords : '@',
+                langs : '=?',
+                uppercaseAllWords : '@'
             },
             controller: function($sce){
                 var ctrl = this;
-
-                if (!ctrl.rows){
-                    ctrl.rows = [
-                        ['1', '2', '3', '4','5','6','7','8', '9', '0', {type: 'erase', colspan: 2, text: '&lArr;'}],
-                        ['q','w','e','r','t','y','u','i','o','p','@'],
-                        ['a','s','d','f','g','h','j','k','l','-','_', {type: 'margin'}],
-                        [{type: 'shift', upperCase: '&dArr;', lowerCase: '&uArr;'}, 'z','x','c','v','b','n','m',',', '.',{type: 'shift', upperCase: '&dArr;', lowerCase: '&uArr;'}],
-                        [{type: 'margin'}, {type: 'space', colspan: 9, text: ' '}]
-                    ];
+                
+                // todo fix me
+                
+                if (!ctrl.langs) {
+                    ctrl.langs = [[
+                        ['X', 'X', 'X', 'X', {type: 'erase', colspan: 2, text: '&lArr;'}],
+                        [{type: 'margin'},['q', 'Q', '1'], ['w', 'W','2'], ['e', 'E','3'], ['r', 'R', '4'], ['t', 'T', '5']],
+                        [{type: 'caps', colspan: 1, text:'caps'},{type: 'shift', colspan: 1,text:'shift'},{type: 'alt', colspan: 1, text: 'alt'}, {type: 'lang', colspan: 1, text:'lang1'}, {type: 'space', colspan: 2, text: ' '}]
+                    ]];
                 }
+                
+                ctrl.currentLayout = 0;
 
                 ctrl.getText = function(key){
-                    if (key.type === 'margin')
-                        return '';
-
-                    var val = '';
-
-                    if (key.text)
-                        val = key.text;
-                    else  if (key.lowerCase && !ctrl.isUpperCase)
-                        val = key.lowerCase;
-                    else  if (key.upperCase && ctrl.isUpperCase)
-                        val = key.upperCase;
-                    else {
-                        val = ctrl.isUpperCase ? key.toUpperCase() : key.toLowerCase();
+                    var val;
+                    if (angular.isString(key)) {
+                        if (ctrl.isAlt) {
+                            val = ''
+                        } else if (ctrl.isUpperCase) {
+                            val = key.toUpperCase();
+                        } else {
+                            val = key.toLowerCase();
+                        }
+                    } else if (angular.isArray(key)) {
+                        if (ctrl.isAlt) {
+                            val = key[2] ? key[2] : '';
+                        } else if (ctrl.isUpperCase) {
+                            val = key[1] ? key[1] : '';
+                        } else {
+                            val = key[0] ? key[0] : '';
+                        }
+                    } else {
+                        if (key.type === 'margin') {
+                            val = '';
+                        } else {
+                            if (key.text) {
+                                val = key.text
+                            } else {
+                                if (ctrl.isAlt) {
+                                    val = key.alt ? key.alt : '';
+                                } else if (ctrl.isUpperCase) {
+                                    val = key.upperCase ? key.upperCase : '';
+                                } else {
+                                    val = key.lowerCase ? key.lowerCase : '';
+                                }
+                            }
+                        }
                     }
-
-                    if (val && val.indexOf('&') > -1)
-                        return $sce.trustAsHtml(val);
-
-                    return val;
+                    
+                    if (val && val.indexOf('&') > -1) {
+                        return $sce.trustAsHtml(val)
+                    }
+                    
+                    return val
                 };
             },
             link: function (scope, element, attr) {
                 var ctrl = scope.ctrl;
                 ctrl.isUpperCase = false;
+                ctrl.isCaps = false;
+                ctrl.isAlt = false;
                 ctrl.lastInputCtrl = null;
                 ctrl.startPos = null;
                 ctrl.endPos = null;
@@ -64,7 +89,33 @@ angular.module('onScreenKeyboard', ['ngSanitize'])
                         ctrl.eraseKeyStroke();
                         return;
                     } else if (key.type === 'shift'){
+                        ctrl.isAlt = false;
                         ctrl.isUpperCase = !ctrl.isUpperCase;
+                        ctrl.isCaps = false;
+                        return;
+                    } else if (key.type === 'caps'){
+                        ctrl.isAlt = false;
+                        ctrl.isCaps = !ctrl.isCaps;
+                        ctrl.isUpperCase = !!ctrl.isCaps;
+                        return;
+                    } else if (key.type === 'alt') {
+                        ctrl.isCaps = false;
+                        ctrl.isUpperCase = false;
+                        ctrl.isAlt = !ctrl.isAlt;
+                        return;
+                    } else if (key.type === 'lang') {
+                        var nextLayout = ctrl.currentLayout + 1;
+                        ctrl.isCaps = false;
+                        ctrl.isUpperCase = false;
+                        ctrl.isAlt = false;
+                        ctrl.isAltLayout = !ctrl.isAltLayout;
+                        
+                        if (nextLayout >= ctrl.langs.length) {
+                            nextLayout = 0;
+                        }
+                        
+                        ctrl.currentLayout = nextLayout;
+                        
                         return;
                     }
 
@@ -119,13 +170,14 @@ angular.module('onScreenKeyboard', ['ngSanitize'])
                         ctrl.isUpperCase = true;
                         return;
                     }
+                    else if (ctrl.isCaps) {
+                        ctrl.isUpperCase = true;
+                    }
                     else if (ctrl.lastInputCtrl.className && ctrl.isUpperCase)
                         ctrl.isUpperCase = false;
                     else if (angular.element(ctrl.lastInputCtrl).val().length === 0) {
                         ctrl.isUpperCase = true;
                     }
-                    else if (angular.element(ctrl.lastInputCtrl).val().slice(-1) === ' ' && !ctrl.isUpperCase && attr.uppercaseAllWords !== undefined)
-                        ctrl.isUpperCase = true;
                     else{
                         ctrl.isUpperCase = false;
                     }
@@ -137,7 +189,7 @@ angular.module('onScreenKeyboard', ['ngSanitize'])
                     if (e.tagName === 'INPUT' || e.tagName === 'TEXTAREA') {
                         ctrl.lastInputCtrl = e;
                         ctrl.setKeyboardLayout();
-                        scope.$digest();
+                        // scope.$digest();
                     }
                 };
 
@@ -149,7 +201,7 @@ angular.module('onScreenKeyboard', ['ngSanitize'])
                     ctrl.endPos = ctrl.lastInputCtrl.selectionEnd;
 
                     ctrl.setKeyboardLayout();
-                    scope.$digest();
+                    // scope.$digest();
                 };
 
                 $document.bind('focusin', focusin);

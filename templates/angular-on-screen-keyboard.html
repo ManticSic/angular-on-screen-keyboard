@@ -1,10 +1,21 @@
 ﻿<div class="keyboard">
     <table>
-        <tr ng-repeat="row in ctrl.rows">
-            <td ng-repeat="key in row"
+        <tr ng-repeat="row in ctrl.langs[ctrl.currentLayout]">
+            <td ng-repeat="key in row track by $index"
                 ng-click="ctrl.printKeyStroke(key, $event)"
                 colspan="{{key.colspan || 1}}"
-                ng-class="{'button': key.type !== 'margin', 'letter': key.type !== 'margin'}"
+                ng-class="{'button': !key.type || key.type !== 'margin',
+                           'letter': !key.type || (key.type !== 'margin' && key.type !== 'caps' && key.type !== 'shift' && key.type !== 'space' && key.type !== 'alt' && key.type !== 'lang'),
+                           'is-upper': ctrl.isUpperCase,
+                           'is-alt': ctrl.isAlt,
+                           'is-caps': ctrl.isCaps,
+                           'margin': key.type === 'margin',
+                           'caps': key.type === 'caps',
+                           'shift': key.type === 'shift',
+                           'space': key.type === 'space',
+                           'alt': key.type === 'alt',
+                           'lang': key.type === 'lang',
+                           'lang-{{ctrl.currentLayout}}': true}"
                 class="{{key.type}}"  ng-bind-html="ctrl.getText(key)">
             </td>
         </tr>
