@@ -6,45 +6,46 @@
   -ms-user-select: none;
   user-select: none;
 }
-.keyboard table {
-  border-spacing: 10px;
-  border-collapse: separate;
-  background-color: #F1F1F1;
+.keyboard .keyboard-row {
+  margin-top: 10px;
 }
-.keyboard table td {
-  touch-action: none;
+.keyboard .keyboard-row:first-child {
+  margin-top: 0;
 }
-.keyboard .button {
-  background-color: #fff;
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
+.keyboard .keyboard-row .keyboard-item {
+  margin-left: 10px;
+  display: inline-block;
   width: 60px;
   height: 60px;
+}
+.keyboard .keyboard-row .keyboard-item:first-child {
+  margin-left: 0;
+}
+.keyboard .keyboard-row .keyboard-item.button {
+  background-color: #fff;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.24);
   text-align: center;
   font-family: "arial";
   cursor: pointer;
   color: #000;
   font-size: 22px;
 }
-.keyboard .button:hover {
+.keyboard .keyboard-row .keyboard-item.button:hover {
   background-color: #fafafa;
 }
-.keyboard .button:active {
+.keyboard .keyboard-row .keyboard-item.button:active {
   background-color: #999;
   color: #fff;
 }
-.keyboard .button.shift.is-upper {
+.keyboard .keyboard-row .keyboard-item.button.shift.is-upper {
   background-color: #999;
   color: #fff;
 }
-.keyboard .button.caps.is-caps {
+.keyboard .keyboard-row .keyboard-item.button.caps.is-caps {
   background-color: #999;
   color: #fff;
 }
-.keyboard .button.alt.is-alt {
+.keyboard .keyboard-row .keyboard-item.button.alt.is-alt {
   background-color: #999;
   color: #fff;
-}
-.keyboard .margin {
-  width: 40px;
-  height: 50px;
 }
